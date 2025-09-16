@@ -3,29 +3,41 @@ import pandas as pd
 from scipy.stats import norm
 import matplotlib.pyplot as plt
 
-# ---------------------------------------
-# 1-3. Create example data and focus on tempo
-# ---------------------------------------
-np.random.seed(42)  # For reproducibility
-# Let's simulate 500 songs with tempos roughly between 100-180 bpm
+# -----------------------------
+# Example Data Creation
+# -----------------------------
+np.random.seed(42)  # for reproducibility
+
+# Simulate 500 songs with tempos roughly between 100-180 bpm
 song_tempos = np.random.normal(loc=130, scale=15, size=500)
-spotify_data = pd.DataFrame({'tempo': song_tempos})
+# Make sure tempos are positive
+song_tempos = np.clip(song_tempos, 50, 200)
 
-# Preview the data
-print(spotify_data.head())
+# Create a DataFrame similar to spotify_data.csv
+spotify_data = pd.DataFrame({
+    'tempo': song_tempos,
+    'danceability': np.random.rand(500),
+    'energy': np.random.rand(500),
+    'instrumentalness': np.random.rand(500),
+    'liveness': np.random.rand(500),
+    'valence': np.random.rand(500)
+})
 
-# ---------------------------------------
-# 5. Population Distribution
-# ---------------------------------------
+# Focus on tempo column
+song_tempos = spotify_data['tempo']
+
+# -----------------------------
+# Population Distribution
+# -----------------------------
 plt.hist(song_tempos, bins=20, edgecolor='black')
 plt.title("Population Distribution of Song Tempos")
 plt.xlabel("Tempo (bpm)")
 plt.ylabel("Frequency")
 plt.show()
 
-# ---------------------------------------
-# 6. Sampling Distribution of the Mean
-# ---------------------------------------
+# -----------------------------
+# Sampling Distribution of the Mean
+# -----------------------------
 sample_size = 30
 num_samples = 1000
 sample_means = [np.mean(np.random.choice(song_tempos, sample_size)) for _ in range(num_samples)]
@@ -37,13 +49,12 @@ plt.axvline(np.mean(song_tempos), color='g', linestyle='solid', linewidth=2, lab
 plt.legend()
 plt.show()
 
-# Mean of sample means vs population mean
 print(f"Mean of Sample Means: {np.mean(sample_means):.2f}")
 print(f"Population Mean: {np.mean(song_tempos):.2f}")
 
-# ---------------------------------------
-# 8. Sampling Distribution of the Minimum
-# ---------------------------------------
+# -----------------------------
+# Sampling Distribution of the Minimum
+# -----------------------------
 sample_mins = [np.min(np.random.choice(song_tempos, sample_size)) for _ in range(num_samples)]
 
 plt.hist(sample_mins, bins=20, edgecolor='black')
@@ -53,10 +64,9 @@ plt.axvline(np.min(song_tempos), color='g', linestyle='solid', linewidth=2, labe
 plt.legend()
 plt.show()
 
-# ---------------------------------------
-# 10. Sampling Distribution of the Variance
-# ---------------------------------------
-# Use ddof=1 to get unbiased sample variance
+# -----------------------------
+# Sampling Distribution of the Variance
+# -----------------------------
 sample_vars = [np.var(np.random.choice(song_tempos, sample_size), ddof=1) for _ in range(num_samples)]
 
 plt.hist(sample_vars, bins=20, edgecolor='black')
@@ -66,28 +76,25 @@ plt.axvline(np.var(song_tempos, ddof=1), color='g', linestyle='solid', linewidth
 plt.legend()
 plt.show()
 
-# ---------------------------------------
-# 13. Population mean and std
-# ---------------------------------------
+# -----------------------------
+# Population Mean, Std, Standard Error
+# -----------------------------
 population_mean = np.mean(song_tempos)
 population_std = np.std(song_tempos, ddof=1)
+standard_error = population_std / np.sqrt(sample_size)
+
 print(f"Population Mean: {population_mean:.2f}")
 print(f"Population Std Dev: {population_std:.2f}")
-
-# ---------------------------------------
-# 14. Standard Error for sample mean (n=30)
-# ---------------------------------------
-standard_error = population_std / np.sqrt(sample_size)
 print(f"Standard Error: {standard_error:.2f}")
 
-# ---------------------------------------
-# 15. Probability sample mean < 140
-# ---------------------------------------
+# -----------------------------
+# Probabilities for Party Planning
+# -----------------------------
+# Probability sample mean < 140 bpm
 prob_less_140 = norm.cdf(140, loc=population_mean, scale=standard_error)
 print(f"Probability sample mean < 140 bpm: {prob_less_140:.4f}")
 
-# ---------------------------------------
-# 16. Probability sample mean > 150
-# ---------------------------------------
+# Probability sample mean > 150 bpm
 prob_greater_150 = 1 - norm.cdf(150, loc=population_mean, scale=standard_error)
 print(f"Probability sample mean > 150 bpm: {prob_greater_150:.4f}")
+
